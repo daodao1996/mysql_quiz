@@ -1,0 +1,64 @@
+practice1:
+ sql:select * from employee where name like '%n%' and salary > 6000;
+ result:
++----+----------+------+--------+-----------+--------+
+| id | name     | age  | gender | companyId | salary |
++----+----------+------+--------+-----------+--------+
+|  1 | xiaohong |   19 | female |         1 |   7000 |
++----+----------+------+--------+-----------+--------+
+1 row in set (0.00 sec)
+
+practice2:
+ sql:select employee.name,company.companyName from employee
+     join(select max(salary) max,companyId from employee group by companyId) g
+     on employee.companyId=g.companyId
+     join company on employee.companyId=company.id
+     where salary=g.max;
+ result:
++----------+-------------+
+| name     | companyName |
++----------+-------------+
+| xiaoming | baidu       |
+| xiaohong | alibaba     |
+| xiaozhi  | tengxun     |
++----------+-------------+
+3 rows in set (0.10 sec)
+
+parctice3:
+ sql:select company.companyName,avg(salary) avgsal
+     from employee
+     inner join company
+     on employee.companyId=company.id
+     group by employee.companyId
+     having avgsal=(select max(a.avsal) maxavgsal from 
+     (select companyId,avg(salary) avgsal from employee group by companyId) a);
+ result:
++-------------+-----------+
+| companyName | avgsal    |
++-------------+-----------+
+| tengxun     | 8000.0000 |
++-------------+-----------+
+1 row in set (0.00 sec)
+
+practice4:
+ sql:select employee.*,company.companyName,a.avgsal from employee
+     join(select avg(salary) avgsal,companyId from employee group by companyId) a
+     on employee.companyId=a.companyId
+     join company on company.id=employee.companyId
+     where salary>=a.avgsal;
+ result:
++----+----------+------+--------+-----------+--------+-------------+-----------+
+
+| id | name     | age  | gender | companyId | salary | companyName | avgsal    |
+
++----+----------+------+--------+-----------+--------+-------------+-----------+
+
+|  0 | xiaoming |   20 | male   |         0 |   6000 | baidu       | 5000.0000 |
+
+|  1 | xiaohong |   19 | female |         1 |   7000 | alibaba     | 6500.0000 |
+
+|  2 | xiaozhi  |   15 | male   |         2 |   8000 | tengxun     | 8000.0000 |
+
++----+----------+------+--------+-----------+--------+-------------+-----------+
+
+3 rows in set (0.00 sec)
